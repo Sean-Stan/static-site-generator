@@ -39,3 +39,26 @@ def text_node_to_html_node(text_node):
     if text_node.text_type == TextType.IMAGE:
         return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
     raise ValueError(f"invalid text type: {text_node.text_type}")
+
+def split_nodes_delimiter(old_nodes, delimiter, text_type):
+    new_nodes = []
+
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT:
+            new_nodes.append(node)
+        else:
+            potential_nodes = node.text.split(delimiter)
+            if len(potential_nodes) == 1:
+                new_nodes.append(node)
+            elif len(potential_nodes) % 2 == 0:
+                raise ValueError("Improper number of delimiters found, invalid Markdown syntax.")
+            else:
+                for i in range(len(potential_nodes)):
+                    if potential_nodes[i] == "":
+                        continue
+                    elif i % 2 == 0:
+                        new_nodes.append(TextNode(potential_nodes[i], TextType.TEXT))
+                    else:
+                        new_nodes.append(TextNode(potential_nodes[i], text_type))
+
+    return new_nodes
