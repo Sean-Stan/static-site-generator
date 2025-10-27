@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType, text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link
+from textnode import TextNode, TextType, text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
 
 
 class TestTextNode(unittest.TestCase):
@@ -252,6 +252,51 @@ class TestTextNodeToHTMLNode(unittest.TestCase):
                 TextNode(" with text that follows", TextType.TEXT),
             ],
             new_nodes,
+        )
+
+    def test_text_to_textnodes(self):
+        markdown_text = """Here is _italic text_ used for emphasis.
+            Here is **bold text** to highlight something important.
+            Inline code looks like this: `print("Hello, world!")`
+            You can include a link like this: [Visit Python.org](https://www.python.org)
+            And here’s an image:
+            ![A cute cat](https://placekitten.com/300/200)"""
+        
+        new_nodes = text_to_textnodes(markdown_text)
+        self.assertListEqual(
+            [
+                TextNode("Here is ", TextType.TEXT),
+                TextNode("italic text", TextType.ITALIC),
+                TextNode(" used for emphasis.\n            Here is ", TextType.TEXT),
+                TextNode("bold text", TextType.BOLD),
+                TextNode(" to highlight something important.\n            Inline code looks like this: ", TextType.TEXT),
+                TextNode("print(\"Hello, world!\")", TextType.CODE),
+                TextNode("\n            You can include a link like this: ", TextType.TEXT),
+                TextNode("Visit Python.org", TextType.LINK, "https://www.python.org"),
+                TextNode("\n            And here’s an image:\n            ", TextType.TEXT),
+                TextNode("A cute cat", TextType.IMAGE, "https://placekitten.com/300/200"),
+            ],
+            new_nodes,
+        )
+
+    def test_text_to_textnodes2(self):
+        nodes = text_to_textnodes(
+            "This is **text** with an _italic_ word and a `code block` and an ![image](https://i.imgur.com/zjjcJKZ.png) and a [link](https://boot.dev)"
+        )
+        self.assertListEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("text", TextType.BOLD),
+                TextNode(" with an ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" word and a ", TextType.TEXT),
+                TextNode("code block", TextType.CODE),
+                TextNode(" and an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+            ],
+            nodes,
         )
 
 
