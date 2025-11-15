@@ -3,7 +3,7 @@ import sys
 from generate_page import generate_pages_recursive
 
 dir_path_static = "./static"
-dir_path_public = "./public"
+dir_path_public = "./docs"
 dir_path_content = "./content"
 template_path = "./template.html"
 
